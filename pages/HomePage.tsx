@@ -1,9 +1,16 @@
 "use client"
 
+import {
+    addMovieToFavorites,
+    fetchFavoritesFromLocalStorage,
+    removeMovieFromFavorites
+} from '../components/localStorageUtils';
+import { useEffect, useState } from 'react';
+
+import Link from 'next/link';
 import MovieCard from '../components/MovieCard';
 import SearchBar from '../components/SearchBar';
 import axios from 'axios';
-import { useState } from 'react';
 
 const API_URL = "http://www.omdbapi.com/";
 const API_KEY = "7c4098e"; // replace with your OMDB API key
@@ -36,11 +43,15 @@ const HomePage: React.FC = () => {
     const toggleFavorite = (id: string) => {
         setFavorites((prevFavorites) => {
             if (prevFavorites.includes(id)) {
+                removeMovieFromFavorites(id); // remove from local storage
                 return prevFavorites.filter((favId) => favId !== id);
+            } else {
+                addMovieToFavorites(id); // add to local storage
+                return [...prevFavorites, id];
             }
-            return [...prevFavorites, id];
         });
     }
+    
 
     const numOfMovies = movies.length;
 
@@ -49,11 +60,21 @@ const HomePage: React.FC = () => {
         if (numOfMovies === 2) return "grid-cols-2";
         return "grid-cols-3";
     };
-
+    useEffect(() => {
+        const favMovies = fetchFavoritesFromLocalStorage();
+        setFavorites(favMovies);
+    }, []);
     return (
-        <div>
-            <SearchBar onSearch={searchMovies} />
-            <div className={`grid ${gridClass()} gap-4`}>
+        <>
+          <nav className="bg-blue-500 p-4 text-white" style={{width:"86rem",background:'darkgray',borderRadius:'12px'}}>
+            <div className="container mx-auto flex justify-between items-center">
+                <div className="font-bold text-xl">MovieApp</div>
+            <Link href=" ./FavMovie">Fav</Link>    
+                <SearchBar onSearch={searchMovies} />
+              
+            </div>
+        </nav>
+            <div className={`grid ${gridClass()} gap-4 mt-11`}>
                 {movies.map(movie => (
                     <MovieCard
                         key={movie.imdbID}
@@ -65,7 +86,7 @@ const HomePage: React.FC = () => {
                     />
                 ))}
             </div>
-        </div>
+        </>
     );
 }
 
