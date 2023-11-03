@@ -39,7 +39,7 @@ export const removeMovieFromFavorites = (movieId:string | number) => {
 
   try {
     const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    const updatedFavorites = favorites.filter(id => id !== movieId);
+    const updatedFavorites = favorites.filter((id: string | number) => id !== movieId);
 
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
   } catch (error) {
