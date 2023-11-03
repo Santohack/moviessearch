@@ -52,7 +52,7 @@ export const removeMovieFromFavorites = (movieId:string | number) => {
  *
  * @return {Array<string|number>} - The list of favorite movie IDs.
  */
-export const fetchFavoritesFromLocalStorage = () => {
+export const fetchFavoritesFromLocalStorage = (): Array<string | number> => {
   try {
     return JSON.parse(localStorage.getItem('favorites') || '[]');
   } catch (error) {
