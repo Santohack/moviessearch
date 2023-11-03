@@ -45,7 +45,7 @@ const FavoritesPage: React.FC = () => {
 
     const loadFavorites = async () => {
         const favMovieIds = fetchFavoritesFromLocalStorage();
-        const movieDetailsPromises = favMovieIds.map(id => fetchFavoriteMovieDetails(id));
+        const movieDetailsPromises = favMovieIds.map((id: string) => fetchFavoriteMovieDetails(id));
         const movies = await Promise.all(movieDetailsPromises);
         setFavoriteMovies(movies.filter(movie => movie !== null));
     };
@@ -62,7 +62,7 @@ const FavoritesPage: React.FC = () => {
         // Check if movie already exists in favorites
         if (favMovieIds.includes(movie.imdbID)) {
             // Remove from favorites
-            const updatedFavs = favMovieIds.filter(id => id !== movie.imdbID);
+            const updatedFavs = favMovieIds.filter((id: string) => id !== movie.imdbID);
             localStorage.setItem('favorites', JSON.stringify(updatedFavs));
         } else {
             // Add to favorites
