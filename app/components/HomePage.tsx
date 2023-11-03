@@ -6,11 +6,12 @@ import {
     removeMovieFromFavorites
 } from './localStorageUtils';
 import { useEffect, useState } from 'react';
+
 import Link from 'next/link';
 import MovieCard from './MovieCard';
-
-import axios from 'axios';
 import { NavBar } from './Navbar';
+import Pagination from './Pagination';
+import axios from 'axios';
 
 const API_URL = "http://www.omdbapi.com/";
 const API_KEY = "7c4098e"; // replace with your OMDB API key
@@ -28,19 +29,38 @@ interface Movie {
 const HomePage: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
     const [favorites, setFavorites] = useState<string[]>([]);
+    const [lastSearchedQuery, setLastSearchedQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const itemsPerPage = 2; 
 
-    const searchMovies = async (query: string) => {
+    // Function to search movies and handle pagination
+    const searchMovies = async (query: string, page: number) => {
         if (!query) return;
 
         try {
-            const response = await axios.get(`${API_URL}?s=${query}&apikey=${API_KEY}`);
+            const response = await axios.get(`${API_URL}?s=${encodeURIComponent(query)}&page=${page}&apikey=${API_KEY}`);
             if (response.data.Search) {
                 setMovies(response.data.Search);
+                setTotalItems(parseInt(response.data.totalResults));
             }
         } catch (error) {
             console.error('Failed to fetch movies:', error);
         }
-    }
+    };
+
+    // This effect runs once on mount and whenever `lastSearchedQuery` or `currentPage` changes
+    useEffect(() => {
+        if (lastSearchedQuery) {
+            searchMovies(lastSearchedQuery, currentPage);
+        }
+    }, [lastSearchedQuery, currentPage]);
+
+    // When the component mounts, it will fetch favorites from local storage
+    useEffect(() => {
+        const favMovies = fetchFavoritesFromLocalStorage();
+        setFavorites(favMovies);
+    }, []);
 
     const toggleFavorite = (id: string) => {
         setFavorites((prevFavorites) => {
@@ -67,7 +87,10 @@ const HomePage: React.FC = () => {
     }, []);
     return (
         <>
-            <NavBar onSearch={searchMovies} />
+            <NavBar onSearch={(query) => {
+                setCurrentPage(1); // Reset to first page on new search
+                setLastSearchedQuery(query);
+            }} />
             <div className={`grid ${gridClass()} gap-4 mt-11`}>
                 {movies.map(movie => (
                     <MovieCard
@@ -80,6 +103,12 @@ const HomePage: React.FC = () => {
                     />
                 ))}
             </div>
+            <Pagination
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                totalItems={totalItems}
+                onPageChange={(pageNumber:any) => setCurrentPage(pageNumber)}
+            />
         </>
     );
 }
