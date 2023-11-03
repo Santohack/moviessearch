@@ -14,7 +14,7 @@ import Pagination from './Pagination';
 import axios from 'axios';
 
 // Your API details
-const API_URL = "http://www.omdbapi.com/";
+const API_URL = "https://www.omdbapi.com/";
 const API_KEY = "7c4098e"; // Replace with your actual OMDB API key
 
 // Movie interface

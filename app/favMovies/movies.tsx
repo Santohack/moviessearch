@@ -7,7 +7,7 @@ import axios from 'axios';
 import client from '../api/httpClient';
 import { fetchFavoritesFromLocalStorage } from '../components/localStorageUtils';
 
-const API_URL = "http://www.omdbapi.com/";
+const API_URL = "https://www.omdbapi.com/";
 const API_KEY = "7c4098e"; // replace with your OMDB API key
 
 interface Movie {
