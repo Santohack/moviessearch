@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import Link from 'next/link';
 import MovieCard from '../components/MovieCard';
-import { NavBar } from '../components/Navbar';
 import axios from 'axios';
 import client from '../api/httpClient';
 import { fetchFavoritesFromLocalStorage } from '../components/localStorageUtils';
@@ -31,18 +29,7 @@ const FavoritesPage: React.FC = () => {
         return "grid-cols-3";
     };
 
-    const searchMovies = async (query: string) => {
-        if (!query) return;
-    
-        try {
-            const response = await client.get(`?s=${query}&apikey=${API_KEY}`);
-            if (response.data.Search) {
-                setSearchResults(response.data.Search);
-            }
-        } catch (error) {
-            console.error('Failed to fetch movies:', error);
-        }
-    }
+
     const fetchFavoriteMovieDetails = async (movieId: string) => {
         try {
             const response = await client.get(`?i=${movieId}&apikey=${API_KEY}`);
@@ -53,8 +40,8 @@ const FavoritesPage: React.FC = () => {
         }
     };
 
-    
-    
+
+    // Function to load favorite movies from local storage and fetch their details
 
     const loadFavorites = async () => {
         const favMovieIds = fetchFavoritesFromLocalStorage();
@@ -64,14 +51,14 @@ const FavoritesPage: React.FC = () => {
     };
 
     useEffect(() => {
-       
-    
+
+
         loadFavorites();
     }, []);
 
     const toggleFavoriteMovie = (movie: Movie) => {
         const favMovieIds = fetchFavoritesFromLocalStorage();
-    
+
         // Check if movie already exists in favorites
         if (favMovieIds.includes(movie.imdbID)) {
             // Remove from favorites
@@ -82,22 +69,22 @@ const FavoritesPage: React.FC = () => {
             favMovieIds.push(movie.imdbID);
             localStorage.setItem('favorites', JSON.stringify(favMovieIds));
         }
-    
+
         // Reload favorites from local storage
         loadFavorites();
     };
-    
-    
+
+
     return (
-        <div style={{backgroundColor:"#e6e8e6"}}>
+        <div style={{ backgroundColor: "#e6e8e6" }}>
             <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl justify-center font-bold">Favorite Movies</h1>
-               
+
             </div>
-            
+
             <div className={`grid ${gridClass()} gap-4 mt-11`}>
-                {favoriteMovies.length === 0 
-                    ? <p className="text-center text-xl">You have no favorite movies!</p> 
+                {favoriteMovies.length === 0
+                    ? <p className="text-center text-xl">You have no favorite movies!</p>
                     : favoriteMovies.map(movie => (
                         <MovieCard
                             key={movie.imdbID}
@@ -105,14 +92,14 @@ const FavoritesPage: React.FC = () => {
                             Poster={movie.Poster}
                             year={movie.Year}
                             isFavorite={true}
-                            toggleFavorite={()=>toggleFavoriteMovie(movie)}
+                            toggleFavorite={() => toggleFavoriteMovie(movie)}
                         />
                     ))
                 }
             </div>
         </div>
     );
-    
+
 }
 
 export default FavoritesPage;

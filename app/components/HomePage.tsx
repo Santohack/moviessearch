@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -7,15 +8,16 @@ import {
 } from './localStorageUtils';
 import { useEffect, useState } from 'react';
 
-import Link from 'next/link';
 import MovieCard from './MovieCard';
 import { NavBar } from './Navbar';
 import Pagination from './Pagination';
 import axios from 'axios';
 
+// Your API details
 const API_URL = "http://www.omdbapi.com/";
-const API_KEY = "7c4098e"; // replace with your OMDB API key
+const API_KEY = "7c4098e"; // Replace with your actual OMDB API key
 
+// Movie interface
 interface Movie {
     Title: string;
     Year: string;
@@ -24,27 +26,43 @@ interface Movie {
     Poster: string;
 }
 
-
-
+// HomePage component
 const HomePage: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
     const [favorites, setFavorites] = useState<string[]>([]);
     const [lastSearchedQuery, setLastSearchedQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
-    const itemsPerPage = 2; 
+    const [error, setError] = useState<string | null>(null); // Added error state
+    const itemsPerPage = 10;
 
-    // Function to search movies and handle pagination
+
+    /**
+        * Searches for movies using the given query and page number and updates state accordingly.
+        * @param {string} query - The search query for the movies.
+        * @param {number} page - The current page number for pagination.
+        */
     const searchMovies = async (query: string, page: number) => {
         if (!query) return;
 
+        setError(null);
+
         try {
+            // Make a GET request to the API with the search query, page number, and API key
             const response = await axios.get(`${API_URL}?s=${encodeURIComponent(query)}&page=${page}&apikey=${API_KEY}`);
-            if (response.data.Search) {
-                setMovies(response.data.Search);
-                setTotalItems(parseInt(response.data.totalResults));
+            const { Search, totalResults } = response.data;
+
+            if (Search) {
+                // Set the movies and totalItems state variables
+                setMovies(Search);
+                setTotalItems(parseInt(totalResults));
+            } else {
+                // If no movies are found, set the error state variable
+                setError('No movies found.');
             }
         } catch (error) {
+            // If an error occurs, set the error state variable and log the error
+            setError('Failed to fetch movies.');
             console.error('Failed to fetch movies:', error);
         }
     };
@@ -56,41 +74,41 @@ const HomePage: React.FC = () => {
         }
     }, [lastSearchedQuery, currentPage]);
 
-    // When the component mounts, it will fetch favorites from local storage
+    // When the component mounts, fetch favorites from local storage
     useEffect(() => {
         const favMovies = fetchFavoritesFromLocalStorage();
         setFavorites(favMovies);
     }, []);
 
+    // Toggle movie as favorite
     const toggleFavorite = (id: string) => {
         setFavorites((prevFavorites) => {
             if (prevFavorites.includes(id)) {
-                removeMovieFromFavorites(id); // remove from local storage
-                return prevFavorites.filter((favId) => favId !== id);
+                removeMovieFromFavorites(id);
+                return prevFavorites.filter(favId => favId !== id);
             } else {
-                addMovieToFavorites(id); // add to local storage
+                addMovieToFavorites(id);
                 return [...prevFavorites, id];
             }
         });
-    }
+    };
 
+    // Generate grid class based on the number of movies
     const numOfMovies = movies.length;
-
     const gridClass = () => {
         if (numOfMovies === 1) return "grid-cols-1";
         if (numOfMovies === 2) return "grid-cols-2";
         return "grid-cols-3";
     };
-    useEffect(() => {
-        const favMovies = fetchFavoritesFromLocalStorage();
-        setFavorites(favMovies);
-    }, []);
+
+    // Render the component
     return (
         <>
             <NavBar onSearch={(query) => {
                 setCurrentPage(1); // Reset to first page on new search
                 setLastSearchedQuery(query);
             }} />
+            {error && <div className="text-red-600">{error}</div>} {/* Display error message if any */}
             <div className={`grid ${gridClass()} gap-4 mt-11`}>
                 {movies.map(movie => (
                     <MovieCard
@@ -107,10 +125,12 @@ const HomePage: React.FC = () => {
                 currentPage={currentPage}
                 itemsPerPage={itemsPerPage}
                 totalItems={totalItems}
-                onPageChange={(pageNumber:any) => setCurrentPage(pageNumber)}
+                onPageChange={(pageNumber: number) => setCurrentPage(pageNumber)}
             />
         </>
     );
-}
+};
 
 export default HomePage;
+
+
