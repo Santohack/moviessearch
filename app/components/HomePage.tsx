@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
 import {
     addMovieToFavorites,
     fetchFavoritesFromLocalStorage,
     removeMovieFromFavorites
-} from '../components/localStorageUtils';
+} from './localStorageUtils';
 import { useEffect, useState } from 'react';
-
 import Link from 'next/link';
-import MovieCard from '../components/MovieCard';
-import SearchBar from '../components/SearchBar';
+import MovieCard from './MovieCard';
+
 import axios from 'axios';
+import { NavBar } from './Navbar';
 
 const API_URL = "http://www.omdbapi.com/";
 const API_KEY = "7c4098e"; // replace with your OMDB API key
@@ -22,6 +22,8 @@ interface Movie {
     Type: string;
     Poster: string;
 }
+
+
 
 const HomePage: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
@@ -51,7 +53,6 @@ const HomePage: React.FC = () => {
             }
         });
     }
-    
 
     const numOfMovies = movies.length;
 
@@ -66,14 +67,7 @@ const HomePage: React.FC = () => {
     }, []);
     return (
         <>
-          <nav className="bg-blue-500 p-4 text-white" style={{width:"86rem",background:'darkgray',borderRadius:'12px'}}>
-            <div className="container mx-auto flex justify-between items-center">
-                <div className="font-bold text-xl">MovieApp</div>
-            <Link href=" ./FavMovie">Fav</Link>    
-                <SearchBar onSearch={searchMovies} />
-              
-            </div>
-        </nav>
+            <NavBar onSearch={searchMovies} />
             <div className={`grid ${gridClass()} gap-4 mt-11`}>
                 {movies.map(movie => (
                     <MovieCard

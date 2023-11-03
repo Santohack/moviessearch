@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import Link from 'next/link';
-import MovieCard from '../components/MovieCard';
+import MovieCard from '../app/components/MovieCard';
 import axios from 'axios';
-import { fetchFavoritesFromLocalStorage } from '../components/localStorageUtils';
+import { fetchFavoritesFromLocalStorage } from '../app/components/localStorageUtils';
 
 const API_URL = "http://www.omdbapi.com/";
 const API_KEY = "7c4098e"; // replace with your OMDB API key
