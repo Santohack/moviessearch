@@ -7,7 +7,7 @@
  * @param {string|number} movieId - The ID of the movie to add to favorites.
  * @throws Will throw an error if the movie ID is not provided or if the operation fails.
  */
-export const addMovieToFavorites = (movieId) => {
+export const addMovieToFavorites = (movieId:string | number) => {
   // Validate input
   if (!movieId) {
     throw new Error('No movie ID provided for adding to favorites.');
@@ -31,7 +31,7 @@ export const addMovieToFavorites = (movieId) => {
  * @param {string|number} movieId - The ID of the movie to remove from favorites.
  * @throws Will throw an error if the movie ID is not provided or if the operation fails.
  */
-export const removeMovieFromFavorites = (movieId) => {
+export const removeMovieFromFavorites = (movieId:string | number) => {
   // Validate input
   if (!movieId) {
     throw new Error('No movie ID provided for removing from favorites.');
